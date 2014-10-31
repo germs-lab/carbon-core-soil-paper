@@ -1,0 +1,9 @@
+	4477803.3.x.cazy.blastxout.best.e-5.cazyfam	4477804.3.x.cazy.blastxout.best.e-5.cazyfam	4477805.3.x.cazy.blastxout.best.e-5.cazyfam	4477807.3.x.cazy.blastxout.best.e-5.cazyfam	4477872.3.x.cazy.blastxout.best.e-5.cazyfam	4477873.3.x.cazy.blastxout.best.e-5.cazyfam	4477874.3.x.cazy.blastxout.best.e-5.cazyfam	4477875.3.x.cazy.blastxout.best.e-5.cazyfam	4477876.3.x.cazy.blastxout.best.e-5.cazyfam	4477877.3.x.cazy.blastxout.best.e-5.cazyfam	4477899.3.x.cazy.blastxout.best.e-5.cazyfam	4477900.3.x.cazy.blastxout.best.e-5.cazyfam	4477901.3.x.cazy.blastxout.best.e-5.cazyfam	4477902.3.x.cazy.blastxout.best.e-5.cazyfam	4477903.3.x.cazy.blastxout.best.e-5.cazyfam	4477904.3.x.cazy.blastxout.best.e-5.cazyfam	aggregates-combined-assembly1.x.cazy.blast8out.besthits.5.cazyfam	core.e-5.cazyfam	
+	2549	4456	3076	10802	3768	6124	4268	4606	4588	5181	3279	4076	1647	3471	1801	3649	11504	43	
+LD	1	7	4	4	1	4	2	4	0	2	1	5	0	1	1	1	141	0	
+GT	29349	24543	26341	38019	29354	48550	28780	22235	28801	28880	17522	32896	27304	38973	28014	44956	93455	412	
+CB	3741	5195	5323	6929	6703	11270	4689	4517	4543	5282	3274	3944	5212	6650	4034	7822	20554	56	
+CE	6680	6944	5874	12607	7271	12437	7834	5935	8051	8304	5034	8008	4827	7955	5054	8998	26972	108	
+LO	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	16	0	
+PL	363	606	888	639	938	1897	483	492	535	679	368	442	161	449	189	541	2487	5	
+GH	26801	30581	32249	45565	34249	60737	34363	22785	31159	30265	18360	31463	30567	38798	25566	46316	71758	287	
