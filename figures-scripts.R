@@ -5,7 +5,6 @@ library(reshape)
 
 setwd("/Users/adina/Google Drive/C_Metabolism_Agg_Paper_2013/reproducibility/")
 ##################################################################################
-#Figure 1
 counts <- read.delim(sep=',',file="core-counts.csv",header=FALSE)
 colnames(counts) <- c('filecount','uniquecazy','bpcount','round')
 counts$filecount <- factor(counts$filecount, levels=c("1","2","3","4"))
@@ -17,7 +16,6 @@ ggsave(file="Fig_1.eps")
 ##################################################################################
 
 ##################################################################################
-#Figure 2a
 abundance_data <- read.delim(sep='\t', file="./summary.unfiltered.txt",header=TRUE, strip.white=TRUE, row.names=1)
 ann_data <- read.delim(sep='\t', file="./annotations_cazy.txt",header=TRUE, strip.white=TRUE, row.names=1)
 ann_only_euk <- subset(ann_data, t1 == "Eukaryota")
@@ -55,9 +53,8 @@ p = ggplot(f2, aes_string(x="Cazy_fam2", y="MEAN"))
 p = p + geom_bar(stat = "identity")+ geom_errorbar(limits, width=0) 
 p = p  + xlab("") + ylab("Abundance (per recA gene)")+ theme_bw()  + theme(axis.text.x = element_text(angle=90, hjust=1))
 p+theme(text=element_text(size=10, family="Helvetica"))+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+theme(axis.text.x=element_text(size=15),axis.text.y=element_text(size=15),axis.title.x=element_text(size=15),axis.title.y=element_text(size=15))
-ggsave(file="Fig_2a.eps")
+ggsave(file="Fig_2.eps")
 ##################################################################################
-#Figure 2b
 mdf = psmelt(all_agg_core)
 mdf <- subset(mdf, Cazy_fam != "none")
 #mdf <- subset(mdf, Cazy_fam2 == "CE")
@@ -70,7 +67,6 @@ foo <- data.frame(foo)
 names(foo) <- c("Cazy_fam", "Agg_sort")
 foo2 <- join(f2, foo)
 f2 <- foo2
-#o <- factor(f2$Cazy_fam, levels=f2$Cazy_fam[order(-f2$Agg_sort)])
 o <- factor(f2$Cazy_fam, levels=f2$Cazy_fam[order(-f2$MEAN)][1:10])
 mdf$agg_frac<-factor(mdf$agg_frac, levels=c("micro","SM","MM","LM","WS"))
 f2$Cazy_fam <- factor(f2$Cazy_fam, levels=c(levels(o)))
@@ -79,11 +75,10 @@ p = ggplot(f2, aes_string(x="Cazy_fam", y="MEAN"))
 p = p + geom_point(stat = "identity", size=5, aes(color=Cazy_fam2, fill=Cazy_fam2))+ geom_errorbar(limits, width=0) 
 p = p  + xlab("") + ylab("Abundance (per recA)")+ theme_bw()  + theme(axis.text.x = element_text(angle=90, hjust=1))
 p+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+theme(axis.text.x=element_text(size=15),axis.text.y=element_text(size=20),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20))+scale_fill_manual("CAZy Enzyme Class", values=c("red","blue","dark green"))+scale_colour_manual("CAZy Enzyme Class", values=c("red","blue","dark green"))
-ggsave(file="Fig_2b.eps")
+ggsave(file="Fig_2_insert.eps")
 ##################################################################################
 
 ##################################################################################
-#Figure 3
 f <- ddply(mdf, .(sample_name, t2), summarise, SUM=sum(Abundance))
 f2 <- ddply(f, .(t2), summarise, MEAN=mean(SUM), SE=sd(SUM)/sqrt(length(SUM)))
 limits<-aes(ymin=MEAN-SE, ymax=MEAN+SE)
@@ -107,8 +102,6 @@ ggsave(file="Fig_3.eps")
 ##################################################################################
 
 ##################################################################################
-#Figure 4a-d
-
 all_agg_filter_empty <- all_agg_core
 mdf = psmelt(all_agg_filter_empty)
 mdf <- subset(mdf, Cazy_fam2 != "none")
@@ -212,7 +205,6 @@ ggsave(file="Supp_Fig_2d.eps")
 
 
 ##################################################################################
-#Figure 5a
 mdf_core<-psmelt(all_agg_core)
 mdf_noncore<-psmelt(all_agg)
 f <- ddply(mdf_core, .(Cazy_fam2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
@@ -331,6 +323,258 @@ p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_tex
 
 ggsave(file="Fig_4b.eps")
 
+f$dataset <- "core"
+g$dataset <- "noncore"
+combo <- rbind(f,g)
+summary(aov.result<-aov(SUMs ~ dataset, data = subset(combo, Cazy_fam == "GT2")))
+summary(aov.result<-aov(SUMs ~ dataset, data = subset(combo, Cazy_fam == "GT4")))
+summary(aov.result<-aov(SUMs ~ dataset, data = subset(combo, Cazy_fam == "GT41")))
+summary(aov.result<-aov(SUMs ~ dataset, data = subset(combo, Cazy_fam == "GH13")))
+summary(aov.result<-aov(SUMs ~ dataset, data = subset(combo, Cazy_fam == "GH3")))
+summary(aov.result<-aov(SUMs ~ dataset, data = subset(combo, Cazy_fam == "CE10")))
+summary(aov.result<-aov(SUMs ~ dataset, data = subset(combo, Cazy_fam == "CE4")))
+summary(aov.result<-aov(SUMs ~ dataset, data = subset(combo, Cazy_fam == "CE1")))
+summary(aov.result<-aov(SUMs ~ dataset, data = subset(combo, Cazy_fam == "GT51")))
+summary(aov.result<-aov(SUMs ~ dataset, data = subset(combo, Cazy_fam == "GH23")))
+
+
+
+
+
+##################################################################################
+#Figure 6a
+mdf_core<-psmelt(all_agg_core)
+mdf_noncore<-psmelt(all_agg)
+f <- ddply(mdf_core, .(Cazy_fam,Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
+f2 <- subset(f, Cazy_fam == "GT4")
+g <- ddply(mdf_noncore, .(Cazy_fam, Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
+g2 <- subset(g, Cazy_fam == "GT4")
+
+smple2_wgt<-aggregate(f2$SUM,by=list(f2$sample_name),FUN=sum)
+
+k<-1
+f2$SUMs<-0
+while(k<=dim(smple_wgt)[1]) {
+	smr<-which(f2$sample_name==smple2_wgt$Group.1[k])
+	f2$SUMs[smr]<-f2$SUM[smr]/smple2_wgt[k,2]
+	k<-k+1
+}
+
+stderr <- function(x){
+	result<-sd(x)/sqrt(length(x))
+	return(result)}
+	
+fam_wgt<-aggregate(f2$SUMs,by=list(f2$t2),FUN=mean)
+fam_wgt2<-aggregate(f2$SUMs,by=list(f2$t2),FUN=stderr)
+names(fam_wgt)[2]<-"mean"
+names(fam_wgt2)[2]<-"std_er"
+fam_stat<-join(fam_wgt,fam_wgt2)
+fam_stat$dataset <- "core"
+
+smple2_wgt<-aggregate(g2$SUM,by=list(g2$sample_name),FUN=sum)
+
+k<-1
+g2$SUMs<-0
+while(k<=dim(smple_wgt)[1]) {
+	smr<-which(g2$sample_name==smple2_wgt$Group.1[k])
+	g2$SUMs[smr]<-g2$SUM[smr]/smple2_wgt[k,2]
+	k<-k+1
+}
+
+fam2_wgt<-aggregate(g2$SUMs,by=list(g2$t2),FUN=mean)
+fam2_wgt2<-aggregate(g2$SUMs,by=list(g2$t2),FUN=stderr)
+names(fam2_wgt)[2]<-"mean"
+names(fam2_wgt2)[2]<-"std_er"
+fam2_stat<-join(fam2_wgt,fam2_wgt2)
+fam2_stat$dataset <- "noncore"
+
+foo <- rbind(fam_stat, fam2_stat)
+limits<-aes(ymin=mean-std_er, ymax=mean+std_er)
+colnames(foo)[1] <- "t2"
+foo <- subset(foo, t2 != "none")
+temp <- subset(foo, dataset=="noncore")
+foo$t2 <- factor(foo$t2, levels=temp$t2[with(temp,order(-mean))][1:9])
+foo <- subset(foo, t2 != "NA")
+p = ggplot(foo, aes_string(x="t2", y="mean", colour="dataset", fill="dataset"))
+p = p + geom_bar(position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
+p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total")) 
+ggsave(file="Supp_Fig_3a.eps")
+
+l = unique(foo$t2)
+length_l = length(l)
+for (i in 1:length_l){
+	f_dat <- subset(f2, t2 == as.character(l[i]))
+	if(dim(f_dat)[1] == 0){
+		print(as.character(l[i]))
+		print("error")} else{
+	g_dat <- subset(g2, t2 == as.character(l[i]))
+	f_dat$dataset <- "core"
+	g_dat$dataset <- "noncore"
+	combined <- rbind(f_dat, g_dat)
+	print(as.character(l[i]))
+	print(summary(aov.result <- aov(SUMs~dataset, data = combined)))
+	}}
+##################################################################################
+
+
+f <- ddply(mdf_core, .(Cazy_fam,Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
+f2 <- subset(f, Cazy_fam == "GH13")
+g <- ddply(mdf_noncore, .(Cazy_fam, Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
+g2 <- subset(g, Cazy_fam == "GH13")
+
+smple2_wgt<-aggregate(f2$SUM,by=list(f2$sample_name),FUN=sum)
+
+k<-1
+f2$SUMs<-0
+while(k<=dim(smple_wgt)[1]) {
+	smr<-which(f2$sample_name==smple2_wgt$Group.1[k])
+	f2$SUMs[smr]<-f2$SUM[smr]/smple2_wgt[k,2]
+	k<-k+1
+}
+
+stderr <- function(x){
+	result<-sd(x)/sqrt(length(x))
+	return(result)}
+	
+fam_wgt<-aggregate(f2$SUMs,by=list(f2$t2),FUN=mean)
+fam_wgt2<-aggregate(f2$SUMs,by=list(f2$t2),FUN=stderr)
+names(fam_wgt)[2]<-"mean"
+names(fam_wgt2)[2]<-"std_er"
+fam_stat<-join(fam_wgt,fam_wgt2)
+fam_stat$dataset <- "core"
+
+smple2_wgt<-aggregate(g2$SUM,by=list(g2$sample_name),FUN=sum)
+
+k<-1
+g2$SUMs<-0
+while(k<=dim(smple_wgt)[1]) {
+	smr<-which(g2$sample_name==smple2_wgt$Group.1[k])
+	g2$SUMs[smr]<-g2$SUM[smr]/smple2_wgt[k,2]
+	k<-k+1
+}
+
+fam2_wgt<-aggregate(g2$SUMs,by=list(g2$t2),FUN=mean)
+fam2_wgt2<-aggregate(g2$SUMs,by=list(g2$t2),FUN=stderr)
+names(fam2_wgt)[2]<-"mean"
+names(fam2_wgt2)[2]<-"std_er"
+fam2_stat<-join(fam2_wgt,fam2_wgt2)
+fam2_stat$dataset <- "noncore"
+
+foo <- rbind(fam_stat, fam2_stat)
+limits<-aes(ymin=mean-std_er, ymax=mean+std_er)
+colnames(foo)[1] <- "t2"
+foo <- subset(foo, t2 != "none")
+temp <- subset(foo, dataset=="noncore")
+foo$t2 <- factor(foo$t2, levels=temp$t2[with(temp,order(-mean))][1:9])
+foo <- subset(foo, t2 != "NA")
+foo_l<-dim(foo)[1]
+foo[foo_l+1,]<-0
+foo$t2[foo_l+1]<-"Bacteroidetes"
+foo$dataset[foo_l+1]<-"core"
+p = ggplot(foo, aes_string(x="t2", y="mean", colour="dataset", fill="dataset"))
+p = p + geom_bar(position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
+p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total")) 
+ggsave(file="Supp_Fig_3b.eps")
+
+
+l = unique(foo$t2)
+length_l = length(l)
+for (i in 1:length_l){
+	f_dat <- subset(f2, t2 == as.character(l[i]))
+	if(dim(f_dat)[1] == 0){
+		print(as.character(l[i]))
+		print("error")} else{
+	g_dat <- subset(g2, t2 == as.character(l[i]))
+	f_dat$dataset <- "core"
+	g_dat$dataset <- "noncore"
+	combined <- rbind(f_dat, g_dat)
+	print(as.character(l[i]))
+	print(summary(aov.result <- aov(SUMs~dataset, data = combined)))
+	}}
+##################################################################################
+#Figure 6c
+
+f <- ddply(mdf_core, .(Cazy_fam,Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
+f2 <- subset(f, Cazy_fam == "CE10")
+g <- ddply(mdf_noncore, .(Cazy_fam, Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
+g2 <- subset(g, Cazy_fam == "CE10")
+
+smple2_wgt<-aggregate(f2$SUM,by=list(f2$sample_name),FUN=sum)
+
+k<-1
+f2$SUMs<-0
+while(k<=dim(smple_wgt)[1]) {
+	smr<-which(f2$sample_name==smple2_wgt$Group.1[k])
+	f2$SUMs[smr]<-f2$SUM[smr]/smple2_wgt[k,2]
+	k<-k+1
+}
+
+stderr <- function(x){
+	result<-sd(x)/sqrt(length(x))
+	return(result)}
+	
+fam_wgt<-aggregate(f2$SUMs,by=list(f2$t2),FUN=mean)
+fam_wgt2<-aggregate(f2$SUMs,by=list(f2$t2),FUN=stderr)
+names(fam_wgt)[2]<-"mean"
+names(fam_wgt2)[2]<-"std_er"
+fam_stat<-join(fam_wgt,fam_wgt2)
+fam_stat$dataset <- "core"
+
+smple2_wgt<-aggregate(g2$SUM,by=list(g2$sample_name),FUN=sum)
+
+k<-1
+g2$SUMs<-0
+while(k<=dim(smple_wgt)[1]) {
+	smr<-which(g2$sample_name==smple2_wgt$Group.1[k])
+	g2$SUMs[smr]<-g2$SUM[smr]/smple2_wgt[k,2]
+	k<-k+1
+}
+
+fam2_wgt<-aggregate(g2$SUMs,by=list(g2$t2),FUN=mean)
+fam2_wgt2<-aggregate(g2$SUMs,by=list(g2$t2),FUN=stderr)
+names(fam2_wgt)[2]<-"mean"
+names(fam2_wgt2)[2]<-"std_er"
+fam2_stat<-join(fam2_wgt,fam2_wgt2)
+fam2_stat$dataset <- "noncore"
+
+foo <- rbind(fam_stat, fam2_stat)
+limits<-aes(ymin=mean-std_er, ymax=mean+std_er)
+colnames(foo)[1] <- "t2"
+foo <- subset(foo, t2 != "none")
+temp <- subset(foo, dataset=="noncore")
+foo$t2 <- factor(foo$t2, levels=temp$t2[with(temp,order(-mean))][1:9])
+foo <- subset(foo, t2 != "NA")
+foo_l<-dim(foo)[1]
+foo[foo_l+1,]<-0
+foo$t2[foo_l+1]<-"Cyanobacteria"
+foo$dataset[foo_l+1]<-"core"
+foo_l<-dim(foo)[1]
+foo[foo_l+1,]<-0
+foo$t2[foo_l+1]<-"Firmicutes"
+foo$dataset[foo_l+1]<-"core"
+foo <- subset(foo, t2 != "")
+p = ggplot(foo, aes_string(x="t2", y="mean", colour="dataset", fill="dataset"))
+p = p + geom_bar(position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
+p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total")) 
+ggsave(file="Supp_Fig_3c.eps")
+
+l = unique(foo$t2)
+length_l = length(l)
+for (i in 1:length_l){
+	f_dat <- subset(f2, t2 == as.character(l[i]))
+	if(dim(f_dat)[1] == 0){
+		print(as.character(l[i]))
+		print("error")} else{
+	g_dat <- subset(g2, t2 == as.character(l[i]))
+	f_dat$dataset <- "core"
+	g_dat$dataset <- "noncore"
+	combined <- rbind(f_dat, g_dat)
+	print(as.character(l[i]))
+	print(summary(aov.result <- aov(SUMs~dataset, data = combined)))
+	}}
+
+
+
 
 ##################################################################################
 #Figure 5
@@ -407,195 +651,6 @@ p = ggplot(mdf_melt, aes_string(x="variable", y="value", color="Cazy_fam", fill=
 p + geom_bar(stat="identity")+theme_bw()+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+theme(axis.text.x=element_text(size=15, angle=90),axis.text.y=element_text(size=20),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20))+xlab("Soil metagenome")+ylab("Relative Abundance")+scale_fill_manual("Cazy Enzyme Class",values=c("red","blue","dark green","orange","brown"))+scale_colour_manual("Cazy Enzyme Class",values=c("red","blue","dark green","orange","brown"))
 ggsave(file="Fig_6.eps")
 
-
-
-
-
-##################################################################################
-#Figure 6a
-mdf_core<-psmelt(all_agg_core)
-mdf_noncore<-psmelt(all_agg)
-f <- ddply(mdf_core, .(Cazy_fam,Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
-f2 <- subset(f, Cazy_fam == "GT4")
-g <- ddply(mdf_noncore, .(Cazy_fam, Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
-g2 <- subset(g, Cazy_fam == "GT4")
-
-smple2_wgt<-aggregate(f2$SUM,by=list(f2$sample_name),FUN=sum)
-
-k<-1
-f2$SUMs<-0
-while(k<=dim(smple_wgt)[1]) {
-	smr<-which(f2$sample_name==smple2_wgt$Group.1[k])
-	f2$SUMs[smr]<-f2$SUM[smr]/smple2_wgt[k,2]
-	k<-k+1
-}
-
-stderr <- function(x){
-	result<-sd(x)/sqrt(length(x))
-	return(result)}
-	
-fam_wgt<-aggregate(f2$SUMs,by=list(f2$t2),FUN=mean)
-fam_wgt2<-aggregate(f2$SUMs,by=list(f2$t2),FUN=stderr)
-names(fam_wgt)[2]<-"mean"
-names(fam_wgt2)[2]<-"std_er"
-fam_stat<-join(fam_wgt,fam_wgt2)
-fam_stat$dataset <- "core"
-
-smple2_wgt<-aggregate(g2$SUM,by=list(g2$sample_name),FUN=sum)
-
-k<-1
-g2$SUMs<-0
-while(k<=dim(smple_wgt)[1]) {
-	smr<-which(g2$sample_name==smple2_wgt$Group.1[k])
-	g2$SUMs[smr]<-g2$SUM[smr]/smple2_wgt[k,2]
-	k<-k+1
-}
-
-fam2_wgt<-aggregate(g2$SUMs,by=list(g2$t2),FUN=mean)
-fam2_wgt2<-aggregate(g2$SUMs,by=list(g2$t2),FUN=stderr)
-names(fam2_wgt)[2]<-"mean"
-names(fam2_wgt2)[2]<-"std_er"
-fam2_stat<-join(fam2_wgt,fam2_wgt2)
-fam2_stat$dataset <- "noncore"
-
-foo <- rbind(fam_stat, fam2_stat)
-limits<-aes(ymin=mean-std_er, ymax=mean+std_er)
-colnames(foo)[1] <- "t2"
-foo <- subset(foo, t2 != "none")
-temp <- subset(foo, dataset=="noncore")
-foo$t2 <- factor(foo$t2, levels=temp$t2[with(temp,order(-mean))][1:9])
-foo <- subset(foo, t2 != "NA")
-p = ggplot(foo, aes_string(x="t2", y="mean", colour="dataset", fill="dataset"))
-p = p + geom_bar(position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
-p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total")) 
-ggsave(file="Supp_Fig_3a.eps")
-##################################################################################
-#Figure 6b
-
-f <- ddply(mdf_core, .(Cazy_fam,Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
-f2 <- subset(f, Cazy_fam == "GH13")
-g <- ddply(mdf_noncore, .(Cazy_fam, Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
-g2 <- subset(g, Cazy_fam == "GH13")
-
-smple2_wgt<-aggregate(f2$SUM,by=list(f2$sample_name),FUN=sum)
-
-k<-1
-f2$SUMs<-0
-while(k<=dim(smple_wgt)[1]) {
-	smr<-which(f2$sample_name==smple2_wgt$Group.1[k])
-	f2$SUMs[smr]<-f2$SUM[smr]/smple2_wgt[k,2]
-	k<-k+1
-}
-
-stderr <- function(x){
-	result<-sd(x)/sqrt(length(x))
-	return(result)}
-	
-fam_wgt<-aggregate(f2$SUMs,by=list(f2$t2),FUN=mean)
-fam_wgt2<-aggregate(f2$SUMs,by=list(f2$t2),FUN=stderr)
-names(fam_wgt)[2]<-"mean"
-names(fam_wgt2)[2]<-"std_er"
-fam_stat<-join(fam_wgt,fam_wgt2)
-fam_stat$dataset <- "core"
-
-smple2_wgt<-aggregate(g2$SUM,by=list(g2$sample_name),FUN=sum)
-
-k<-1
-g2$SUMs<-0
-while(k<=dim(smple_wgt)[1]) {
-	smr<-which(g2$sample_name==smple2_wgt$Group.1[k])
-	g2$SUMs[smr]<-g2$SUM[smr]/smple2_wgt[k,2]
-	k<-k+1
-}
-
-fam2_wgt<-aggregate(g2$SUMs,by=list(g2$t2),FUN=mean)
-fam2_wgt2<-aggregate(g2$SUMs,by=list(g2$t2),FUN=stderr)
-names(fam2_wgt)[2]<-"mean"
-names(fam2_wgt2)[2]<-"std_er"
-fam2_stat<-join(fam2_wgt,fam2_wgt2)
-fam2_stat$dataset <- "noncore"
-
-foo <- rbind(fam_stat, fam2_stat)
-limits<-aes(ymin=mean-std_er, ymax=mean+std_er)
-colnames(foo)[1] <- "t2"
-foo <- subset(foo, t2 != "none")
-temp <- subset(foo, dataset=="noncore")
-foo$t2 <- factor(foo$t2, levels=temp$t2[with(temp,order(-mean))][1:9])
-foo <- subset(foo, t2 != "NA")
-foo_l<-dim(foo)[1]
-foo[foo_l+1,]<-0
-foo$t2[foo_l+1]<-"Bacteroidetes"
-foo$dataset[foo_l+1]<-"core"
-p = ggplot(foo, aes_string(x="t2", y="mean", colour="dataset", fill="dataset"))
-p = p + geom_bar(position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
-p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total")) 
-ggsave(file="Supp_Fig_3b.eps")
-##################################################################################
-#Figure 6c
-
-f <- ddply(mdf_core, .(Cazy_fam,Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
-f2 <- subset(f, Cazy_fam == "CE10")
-g <- ddply(mdf_noncore, .(Cazy_fam, Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
-g2 <- subset(g, Cazy_fam == "CE10")
-
-smple2_wgt<-aggregate(f2$SUM,by=list(f2$sample_name),FUN=sum)
-
-k<-1
-f2$SUMs<-0
-while(k<=dim(smple_wgt)[1]) {
-	smr<-which(f2$sample_name==smple2_wgt$Group.1[k])
-	f2$SUMs[smr]<-f2$SUM[smr]/smple2_wgt[k,2]
-	k<-k+1
-}
-
-stderr <- function(x){
-	result<-sd(x)/sqrt(length(x))
-	return(result)}
-	
-fam_wgt<-aggregate(f2$SUMs,by=list(f2$t2),FUN=mean)
-fam_wgt2<-aggregate(f2$SUMs,by=list(f2$t2),FUN=stderr)
-names(fam_wgt)[2]<-"mean"
-names(fam_wgt2)[2]<-"std_er"
-fam_stat<-join(fam_wgt,fam_wgt2)
-fam_stat$dataset <- "core"
-
-smple2_wgt<-aggregate(g2$SUM,by=list(g2$sample_name),FUN=sum)
-
-k<-1
-g2$SUMs<-0
-while(k<=dim(smple_wgt)[1]) {
-	smr<-which(g2$sample_name==smple2_wgt$Group.1[k])
-	g2$SUMs[smr]<-g2$SUM[smr]/smple2_wgt[k,2]
-	k<-k+1
-}
-
-fam2_wgt<-aggregate(g2$SUMs,by=list(g2$t2),FUN=mean)
-fam2_wgt2<-aggregate(g2$SUMs,by=list(g2$t2),FUN=stderr)
-names(fam2_wgt)[2]<-"mean"
-names(fam2_wgt2)[2]<-"std_er"
-fam2_stat<-join(fam2_wgt,fam2_wgt2)
-fam2_stat$dataset <- "noncore"
-
-foo <- rbind(fam_stat, fam2_stat)
-limits<-aes(ymin=mean-std_er, ymax=mean+std_er)
-colnames(foo)[1] <- "t2"
-foo <- subset(foo, t2 != "none")
-temp <- subset(foo, dataset=="noncore")
-foo$t2 <- factor(foo$t2, levels=temp$t2[with(temp,order(-mean))][1:9])
-foo <- subset(foo, t2 != "NA")
-foo_l<-dim(foo)[1]
-foo[foo_l+1,]<-0
-foo$t2[foo_l+1]<-"Cyanobacteria"
-foo$dataset[foo_l+1]<-"core"
-foo_l<-dim(foo)[1]
-foo[foo_l+1,]<-0
-foo$t2[foo_l+1]<-"Firmicutes"
-foo$dataset[foo_l+1]<-"core"
-
-p = ggplot(foo, aes_string(x="t2", y="mean", colour="dataset", fill="dataset"))
-p = p + geom_bar(position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
-p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total")) 
-ggsave(file="Supp_Fig_3c.eps")
 
 
 
