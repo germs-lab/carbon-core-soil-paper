@@ -355,13 +355,15 @@ summary(aov.result<-aov(SUMs ~ dataset, data = subset(combo, Cazy_fam == "GH23")
 
 ##################################################################################
 #SUPP FIG 3A
+
+
 mdf_core<-psmelt(all_agg_core)
 mdf_noncore<-psmelt(all_agg)
 f <- ddply(mdf_core, .(Cazy_fam,Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
 f2 <- subset(f, Cazy_fam == "GT4")
 g <- ddply(mdf_noncore, .(Cazy_fam, Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
 g2 <- subset(g, Cazy_fam == "GT4")
-
+smple_wgt<-aggregate(f$SUM,by=list(f$sample_name),FUN=sum)
 smple2_wgt<-aggregate(f2$SUM,by=list(f2$sample_name),FUN=sum)
 
 k<-1
@@ -572,6 +574,66 @@ p = p + geom_bar(position="dodge") + geom_errorbar(limits, width=0, position=pos
 p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+facet_grid(~Cazy_fam2)+theme(text=element_text(size=18), strip.text.x = element_text(angle = 90))+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total"))+annotate("text",x=1,y=.55,label="***") + annotate("text",x=4,y=.1,label="**") + annotate("text",x=8,y=.1,label="*") 
 ggsave(file="Supp_Fig_3c.eps")
 
+##################################################################################
+#SUPP FIGURE 3D
+mdf_core<-psmelt(all_agg_core)
+mdf_noncore<-psmelt(all_agg)
+f <- ddply(mdf_core, .(Cazy_fam,Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
+f2 <- subset(f, Cazy_fam == "GT2")
+g <- ddply(mdf_noncore, .(Cazy_fam, Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
+g2 <- subset(g, Cazy_fam == "GT2")
+smple_wgt<-aggregate(f$SUM,by=list(f$sample_name),FUN=sum)
+smple2_wgt<-aggregate(f2$SUM,by=list(f2$sample_name),FUN=sum)
+
+
+k<-1
+f2$SUMs<-0
+while(k<=dim(smple_wgt)[1]) {
+	smr<-which(f2$sample_name==smple2_wgt$Group.1[k])
+	f2$SUMs[smr]<-f2$SUM[smr]/smple2_wgt[k,2]
+	k<-k+1
+}
+
+stderr <- function(x){
+	result<-sd(x)/sqrt(length(x))
+	return(result)}
+	
+fam_wgt<-aggregate(f2$SUMs,by=list(f2$t2),FUN=mean)
+fam_wgt2<-aggregate(f2$SUMs,by=list(f2$t2),FUN=stderr)
+names(fam_wgt)[2]<-"mean"
+names(fam_wgt2)[2]<-"std_er"
+fam_stat<-join(fam_wgt,fam_wgt2)
+fam_stat$dataset <- "core"
+
+smple2_wgt<-aggregate(g2$SUM,by=list(g2$sample_name),FUN=sum)
+
+k<-1
+g2$SUMs<-0
+while(k<=dim(smple_wgt)[1]) {
+	smr<-which(g2$sample_name==smple2_wgt$Group.1[k])
+	g2$SUMs[smr]<-g2$SUM[smr]/smple2_wgt[k,2]
+	k<-k+1
+}
+
+fam2_wgt<-aggregate(g2$SUMs,by=list(g2$t2),FUN=mean)
+fam2_wgt2<-aggregate(g2$SUMs,by=list(g2$t2),FUN=stderr)
+names(fam2_wgt)[2]<-"mean"
+names(fam2_wgt2)[2]<-"std_er"
+fam2_stat<-join(fam2_wgt,fam2_wgt2)
+fam2_stat$dataset <- "noncore"
+
+foo <- rbind(fam_stat, fam2_stat)
+limits<-aes(ymin=mean-std_er, ymax=mean+std_er)
+colnames(foo)[1] <- "t2"
+foo <- subset(foo, foo$t2 == "Proteobacteria" | foo$t2 == "Bacteroidetes" | foo$t2 == "Actinobacteria" | foo$t2 == "Cyanobacteria" | foo$t2 == "Firmicutes"| foo$t2 == "Chloroflexi" | foo$t2 == "Acidobacteria" | foo$t2 == "Euryarchaeota" | foo$t2 == "Crenarchaeota")
+temp <- subset(foo, dataset=="noncore")
+foo$t2 <- factor(foo$t2, levels=temp$t2[with(temp,order(-mean))][1:9])
+foo$Cazy_fam2 <- "GT2"
+p = ggplot(foo, aes_string(x="t2", y="mean", colour="dataset", fill="dataset"))
+p = p + geom_bar(position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
+p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+facet_grid(~Cazy_fam2)+theme(text=element_text(size=18), strip.text.x = element_text(angle = 90))+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total"))+annotate("text",x=3,y=.2,label="**") + annotate("text",x=4,y=.12,label="***") + annotate("text",x=5,y=.08,label="***")+ annotate("text",x=6,y=.06,label="***") + annotate("text",x=8,y=.04,label="**")
+ggsave(file="Supp_Fig_3d.eps")
+
 l = unique(foo$t2)
 length_l = length(l)
 for (i in 1:length_l){
@@ -702,120 +764,12 @@ p + theme_bw()+ theme(axis.text.x = element_text(angle=90, hjust=1))+opts(panel.
 ggsave(file="Supp_Fig_4.eps")
 
 
-
-
 ##################################################################################
-#Supp Figure X
-CAZY_choice = "PL"
-counts <- read.delim(sep='\t',file="cazy-annotations.info",header=FALSE)
-colnames(counts)<-c("Cazy_fam2", "Cazy_fam", "hit_id", "t1","t2","t3")
-f<-ddply(counts, .(Cazy_fam, t2), summarise, SUM=length(Cazy_fam))
-f <- subset(f, Cazy_fam == CAZY_choice)
-f2<-ddply(f, .(Cazy_fam, t2, SUM), summarise, NORM=SUM/sum(f$SUM))
-
-mdf <- psmelt(all_agg_core)
-f <- ddply(mdf, .(Cazy_fam2,t2, sample_name), summarise, SUM=sum(Abundance))
-#f2 <- subset(f, Cazy_fam == "CE10")
-#g <- ddply(mdf_noncore, .(Cazy_fam, Cazy_fam2, t2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
-#g2 <- subset(g, Cazy_fam == "CE10")
-f <- subset(f, Cazy_fam2 == CAZY_choice)
-smple_wgt<-aggregate(f$SUM,by=list(f$sample_name),FUN=sum)
-
-k<-1
-f$SUMs<-0
-while(k<=dim(smple_wgt)[1]) {
-	smr<-which(f$sample_name==smple_wgt$Group.1[k])
-	f$SUMs[smr]<-f$SUM[smr]/smple_wgt[k,2]
-	k<-k+1
-}
-
-stderr <- function(x){
-	result<-sd(x)/sqrt(length(x))
-	return(result)}
-	
-fam_wgt<-aggregate(f$SUMs,by=list(f$t2),FUN=mean)
-fam_wgt2<-aggregate(f$SUMs,by=list(f$t2),FUN=stderr)
-names(fam_wgt)[2]<-"mean"
-names(fam_wgt2)[2]<-"std_er"
-fam_stat<-join(fam_wgt,fam_wgt2)
-fam_stat$dataset <- "core"
-
-f2$dataset<- "CAZy"
-f2 <- subset(f2, f2 == CAZY_choice)
-colnames(f2)<-c("Cazy_fam", "Group.1", "SUM","mean", "dataset")
-f2$Cazy_fam <- NULL
-f2$SUM <- NULL
-f2$std_er <- 0
-
-merge1 <- rbind(fam_stat, f2)
-colnames(merge1) <- c("t2", "mean" ,"std_er", "dataset")
-merge1 <- subset(merge1, t2 != "")
-merge1 <- subset(merge1, t2 != "dsDNA")
-merge1 <- subset(merge1, t2 != "environmental")
-merge1 <- subset(merge1, t2 != "candidate")
-#merge1$Cazy_fam2 <- factor(merge1$Cazy_fam2, levels=merge1$Cazy_fam2[with(merge1, order(-NORM))])
-merge1$dataset <- factor(merge1$dataset,levels=c("core","CAZy"))
-temp <- subset(merge1, dataset == "core")
-merge1$t2 <- factor(merge1$t2, levels=merge1$t2[with(temp, order(-mean))])
-merge1 <- subset(merge1, t2 != "NA")
-#merge1$t2=factor(merge1$t2, levels=c("Proteobacteria","Bacteroidetes","Firmicutes","Euryarchaeota","Actinobacteria","Chloroflexi","Viridiplantae","Verrucomicrobia","Cyanobacteria","Spirochaetes","Crenarchaeota","Acidobacteria","Planctomycetes","Korarchaeota","Fungi","Chlorobi","Metazoa","Aquificae","Mycetozoa","Chlamydiae","Thermotogae","Deinococcus-Thermus","Alveolata"))
-
-#merge1 <- subset(merge1, Cazy_fam2 != "NA")
-#temp <- subset(merge1, dataset=="core")
-#temp <- subset(temp, Cazy_fam2 == "GT")
-#merge1$t2 <- factor(merge1$t2, levels=temp$t2[with(temp, order(-mean))][1:10])
-#merge1$Cazy_fam2 <- factor(merge1$Cazy_fam2, levels=c("GT","GH","CE","PL"))
-#merge1 <- subset(merge1, t2 != "<NA>")
-limits<-aes(ymin=mean-std_er, ymax=mean+std_er)
-
-p = ggplot(merge1, aes_string(x="t2", y="mean", colour="dataset", fill="dataset"))
-p = p + geom_bar(position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
-p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total")) 
-ggsave(file="Supp_fig_7_PL.eps")
-
-#Counting core presence in other aggregates
-min_count = 5
-in_all_samples <- subset(abundance_data, abundance_data$PF_WS_H15 >=min_count &                           abundance_data$PF_WS_H07 >=min_count & abundance_data$PF_WS_H09 >=min_count  & abundance_data$PF_WS_H04 >=min_count)
-abundance_data <- in_all_samples
-in_all_samples_agg <- subset(abundance_data, abundance_data$PF_LM_H08 >=min_count |                           abundance_data$PF_LM_H14 >=min_count | abundance_data$PF_LM_H16 >=min_count |                           abundance_data$PF_LM_H03 >=min_count | abundance_data$PF_MI_H01 >=min_count |                           abundance_data$PF_MI_H06 >=min_count | abundance_data$PF_MI_H12 >=min_count |                           abundance_data$PF_MI_H13 >=min_count | abundance_data$PF_MM_H17 >=min_count |                           abundance_data$PF_MM_H19 >=min_count | abundance_data$PF_MM_H20 >=min_count |                           abundance_data$PF_SM_H02 >=min_count | abundance_data$PF_SM_H10 >=min_count |                           abundance_data$PF_SM_H11 >=min_count)
-abundance_data <- as.matrix(in_all_samples_agg)
-abundance <- otu_table(abundance_data, taxa_are_rows=TRUE)
-all_agg_pf_agg <- phyloseq(metadata, annotation, abundance)
-all_agg_pf_agg
-
-in_all_samples <- subset(abundance_data, abundance_data$PF_WS_H15 >=min_count &                           abundance_data$PF_WS_H07 >=min_count & abundance_data$PF_WS_H09 >=min_count  & abundance_data$PF_WS_H04 >=min_count)
-abundance_data <- in_all_samples
-in_all_samples_up <- subset(abundance_data, abundance_data$UP_MI_H41 >=min_count |                           abundance_data$UP_MI_H43 >=min_count | abundance_data$UP_MI_H57 >=min_count |                           abundance_data$UP_MI_H59 >=min_count)
-abundance_data <- as.matrix(in_all_samples_up)
-abundance <- otu_table(abundance_data, taxa_are_rows=TRUE)
-all_agg_up_agg <- phyloseq(metadata, annotation, abundance)
-all_agg_up_agg
-
-in_all_samples <- subset(abundance_data, abundance_data$PF_WS_H15 >=min_count &                           abundance_data$PF_WS_H07 >=min_count & abundance_data$PF_WS_H09 >=min_count  & abundance_data$PF_WS_H04 >=min_count)
-abundance_data <- in_all_samples
-in_all_samples_corn <- subset(abundance_data, abundance_data$CC_MI_H30  >=min_count |                           abundance_data$CC_MI_H34 >=min_count)
-abundance_data <- as.matrix(in_all_samples_corn)
-abundance <- otu_table(abundance_data, taxa_are_rows=TRUE)
-all_agg_corn_agg <- phyloseq(metadata, annotation, abundance)
-all_agg_corn_agg
-
-
-####Venn diagram work###
-core_taxa = data.frame(tax_table(all_agg_core))
-cum_taxa = data.frame(tax_table(all_agg))
-core_taxa_gh13 = subset(core_taxa, Cazy_fam == "GT2")
-core_taxa_gh13 = subset(core_taxa_gh13, t2 == "Actinobacteria")
-core_taxa_gh13 = subset(core_taxa_gh13, t2 == "Proteobacteria")
-core_taxa_gh13 = subset(core_taxa_gh13, t2 == "Acidobacteria")
-core_taxa_gh13 = subset(core_taxa_gh13, t2 == "Acidobacteria")
-cum_taxa_gh13 = subset(cum_taxa, Cazy_fam == "GT2")
-cum_taxa_gh13 = subset(cum_taxa_gh13, t2 == "Actinobacteria")
-cum_taxa_gh13 = subset(cum_taxa_gh13, t2 == "Proteobacteria")
-cum_taxa_gh13 = subset(cum_taxa_gh13, t2 == "Acidobacteria")
-cum_taxa_gh13 = subset(cum_taxa_gh13, t2 == "Acidobacteria")
-cat(as.character(unique(cum_taxa_gh13$hit_id)), sep="\n")
-cat(as.character(unique(core_taxa_gh13$hit_id)), sep="\n")
-cat(as.character(unique(cum_taxa_gh13$t3)), sep="\n")
-cat(as.character(unique(core_taxa_gh13$t3)), sep="\n")
-write.table(unique(core_taxa_gh13), file="proteo-GT2-core.tsv", sep="\t", row.names=TRUE, col.names=TRUE, quote=FALSE)
-write.table(unique(cum_taxa_gh13), file="proteo-GT2-cum.tsv", sep="\t", row.names=TRUE, col.names=TRUE, quote=FALSE)
+#Supp Table 3
+mdf = psmelt(all_agg_core)
+f <- ddply(mdf, .(OTU), summarise, MEAN=mean(Abundance), SE=sd(Abundance)/sqrt(4))
+ann <- as.data.frame(tax_table(all_agg_core))
+merged <- cbind(f, ann)
+summary(merged$MEAN)
+colnames(merged)<-c("Contig", "Mean Abundance", "SE","E.C.","CAZy Class","Family", "Hit ID", "Description","Taxonomy Lineage","","")
+write.table(merged, file="Supp_Table_3.tsv", quote=FALSE, sep="\t",row.names=TRUE, col.names=TRUE)
