@@ -1,0 +1,211 @@
+library(plyr)#
+library(ggplot2)#
+library(reshape)#
+setwd("/Users/adina/software/carbon-core-soil-paper/bias-check")#
+#
+db_counts <- read.delim(sep=' ',file="cazy-db-1000.txt")#
+colnames(db_counts)<-c("rep","LD","GT","CB","CE","LO","PL","GH")#
+db_counts$"NA" <- NULL#
+db_counts$rep <- NULL#
+head(db_counts)#
+summary(db_counts)#
+means <-colMeans(db_counts)
+boxplot(db_counts)
+head(db_counts)
+db_counts$dataset <- "CAZy database"
+db_counts
+means
+db_counts2 <- read.delim(sep=' ', file="cazy-contigs-1000.txt")
+head(db_counts2)
+colnames(db_counts2)<-c("rep","LD","GT","CB","CE","LO","PL","GH")
+head(db_counts2)
+head(db_counts)
+colnames(db_counts2)<-c("rep","LD","GT","CB","CE","PL","GH")
+head(db_counts2)
+db_counts2$"NA" <- NULL
+db_counts2$rep <- NULL
+head(db_counts2)
+db_counts2$LO <- 0
+head(db_counts2)
+db_counts2$dataset <- "Metagenome"
+merged <- merge(db_counts, db_counts2)
+head(merged)
+merged <- rowmerge(db_counts, db_counts2)
+merged <- rbind(db_counts, db_counts2)
+merged
+hed(merged)
+head(merged)
+summary(merged)
+x=subset(merged, dataset=="CAZy database")
+y=subset(merged, dataset=="Metagenome")
+boxplot(x,y)
+summary(x)
+x
+y
+dim(x)
+boxplot(x[1:7],y[1:7])
+boxplot(x[,1:7],y[,1:7])
+boxplot(x[,1:7])
+boxplot(y[,1:7])
+y[,1:7]
+dim(y[,1:7])
+boxplot(x[,1:7], y[,1:7])
+head(merged)
+boxplot(merged)
+boxplot(merged[,1:7])
+boxplot(merged[,1:7,las=2])
+boxplot(merged[,1:7],las=2)
+db_counts <- read.delim(sep=' ',file="cazy-db-1000.txt")
+colnames(db_counts)<-c("rep","LD-db","GT-db","CB-db","CE-db","LO-db","PL-db","GH-db")
+db_counts$"NA" <- NULL
+db_counts$rep <- NULL
+head(db_counts)
+summary(db_counts)
+means <-colMeans(db_counts)
+db_counts$dataset <- "CAZy database"
+db_counts2 <- read.delim(sep=' ', file="cazy-contigs-1000.txt")
+colnames(db_counts2)<-c("rep","LD","GT","CB","CE","PL","GH")
+db_counts2$"NA" <- NULL
+db_counts2$rep <- NULL
+db_counts2$LO <- 0
+db_counts2$dataset <- "Metagenome"
+merged <- rbind(db_counts, db_counts2)
+merged <- bind(db_counts, db_counts2)
+merged <- merge(db_counts, db_counts2)
+merged
+merged <- cbind(db_counts, db_counts2)
+merged
+head(merged)
+db_counts <- read.delim(sep=' ',file="cazy-db-1000.txt")
+colnames(db_counts)<-c("rep","LD-db","GT-db","CB-db","CE-db","LO-db","PL-db","GH-db")
+db_counts$"NA" <- NULL
+db_counts$rep <- NULL
+head(db_counts)
+summary(db_counts)
+means <-colMeans(db_counts)
+db_counts2 <- read.delim(sep=' ', file="cazy-contigs-1000.txt")
+colnames(db_counts2)<-c("rep","LD","GT","CB","CE","PL","GH")
+db_counts2$"NA" <- NULL
+db_counts2$rep <- NULL
+db_counts2$LO <- 0
+merged <- cbind(db_counts, db_counts2)
+x=subset(merged, dataset=="CAZy database")
+head(merged)
+boxplot(merged,las=2)
+head(merged)
+merged[c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","LO","GH-db","GH")]
+merged2 <- merged[c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","LO","GH-db","GH")]
+head(merged2)
+merged2 <- merged[c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH")]
+head(merged2)
+boxplot(merged,las=2)
+boxplot(merged2,las=2)
+summary(db_counts)
+colnames(db_counts)<-c("rep","CB-db","CE-db","GH-db","GT-db","LD-db","LO-db","PL-db")
+db_counts <- read.delim(sep=' ',file="cazy-db-1000.txt")
+colnames(db_counts)<-c("rep","CB-db","CE-db","GH-db","GT-db","LD-db","LO-db","PL-db")
+db_counts$"NA" <- NULL
+db_counts$rep <- NULL
+head(db_counts)
+db_counts2 <- read.delim(sep=' ', file="cazy-contigs-1000.txt")
+colnames(db_counts2)<-c("rep","CB","CE","GH","GT","LD","PL")
+db_counts2$"NA" <- NULL
+db_counts2$rep <- NULL
+db_counts2$LO <- 0
+merged <- cbind(db_counts, db_counts2)
+head(merged)
+summary(merged)
+merged2 <- merged[c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH")]
+boxplot(merged2,las=2)
+boxplot(merged,las=2,at=c(1,2,3,4,5,6,7,9,10,11,12,13,14,15),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"))
+boxplot(merged,las=2,at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"))
+boxplot(merged,las=2,at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"), col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue")
+boxplot(merged,las=2,at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"), col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"))
+boxplot(merged,las=2,at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"), col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"))
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"), )
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"), )
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"))
+x
+means2 <- colMeans(db_counts2)
+means <-colMeans(db_counts)
+means
+means2
+summary(aov.result<-aov(GT~dataset), data = merged)
+head(merged)
+db_counts_stats <- db_counts
+db_counts_stats$dataset <- "CAZy database"
+db_counts2_stats <- db_counts2
+db_counts2_stats$dataset <- "CAZy database"
+db_counts2_stats$dataset <- "Metagenome"
+merged_stats <- rbind(db_counts_stats, db_counts_stats2)
+merged_stats <- rbind(db_counts_stats, db_counts2_stats)
+db_counts_stats
+db_counts2_stats
+db_counts2_stats$LO <- 0
+db_counts2_stats <- db_counts2
+db_counts2_stats$dataset <- "Metagenome"
+merged <- cbind(db_counts, db_counts2)
+head(merged)
+merged
+merged_stats <- rbind(db_counts_stats, db_counts2_stats)
+merged_stats <- rbind(db_counts_stats, db_counts2_stats)
+head(db_counts_stats)
+colnames(db_counts)<-c("CB","CE","GH","GT","LD","LO","PL")
+colnames(db_counts_stats)<-c("CB","CE","GH","GT","LD","LO","PL")
+merged_stats <- rbind(db_counts_stats, db_counts2_stats)
+head(db_counts_stats)
+db_counts <- read.delim(sep=' ',file="cazy-db-1000.txt")
+colnames(db_counts)<-c("rep","CB-db","CE-db","GH-db","GT-db","LD-db","LO-db","PL-db")
+db_counts$"NA" <- NULL
+db_counts$rep <- NULL
+head(db_counts)
+summary(db_counts)
+means <-colMeans(db_counts)
+db_counts_stats <- db_counts
+colnames(db_counts_stats)<-c("CB","CE","GH","GT","LD","LO","PL")
+db_counts_stats$dataset <- "CAZy database"
+db_counts_stats
+merged_stats <- rbind(db_counts_stats, db_counts2_stats)
+head(merged_stats)
+summary(merged_stats)
+summary(aov.results<-aov(CB~dataset,data=merged_stats))
+summary(aov.results<-aov(GT~dataset,data=merged_stats))
+TukeyHSD(aov.results)
+summary(aov.results<-aov(~dataset,data=merged_stats))
+summary(aov.results<-aov(CB~dataset,data=merged_stats))
+summary(aov.results<-aov(CE~dataset,data=merged_stats))
+summary(aov.results<-aov(GH~dataset,data=merged_stats))
+summary(aov.results<-aov(LO~dataset,data=merged_stats))
+summary(aov.results<-aov(PL~dataset,data=merged_stats))
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"))
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class")
+mtext(“Label”, side = 1, line = 7)
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class")
+mtext(“Label”, side = 1, line = 7)
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",mtext(“Label”, side = 1, line = 7))
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",mtext(“Label”, side = 1, line = 7))
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count")
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count", cex.lab=0.75)
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count", cex=0.75 cex.lab=0.75)
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count", cex=0.75, cex.lab=0.75)
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count", cex=0.75, cex.lab=0.75)
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count", cex=0.75)
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count", cex=0.5)
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count", cex.axis=0.5)
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count", cex.axis=0.75)
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count", cex.axis=0.75)+annotate("text",x=5000,1)
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count", cex.axis=0.75)+annotate("text",x=5000,y=1,label="***")
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count", cex.axis=0.75)#+annotate("text",x=5000,y=1,label="***")
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count", cex.axis=0.75)
+savefig("database-bias-fig.eps")
+savefig("database-bias-fig.eps",type="eps")
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count", cex.axis=0.75)
+savefig("database-bias-fig.eps",type="eps")
+saveeps("database-bias-fig.eps",type="eps")
+eps(filename="database-bias-fig.eps",type="eps")
+png(filename="database-bias-fig.eps")
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count", cex.axis=0.75)
+dev.off()
+png(filename="database-bias-fig.png")
+boxplot(merged,las=2,col=c("red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"),at=c(1,2,4,5,7,8,10,11,13,14,16,17,19,20),names=c("LD-db","LD","GT-db","GT","CB-db","CB","CE-db","CE","LO-db","LO","PL-db","PL","GH-db","GH"),xlab="CAZy Class",ylab="Count", cex.axis=0.75)
+dev.off()
