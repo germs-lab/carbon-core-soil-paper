@@ -649,9 +649,21 @@ for (i in 1:length_l){
 	print(summary(aov.result <- aov(SUMs~dataset, data = combined)))
 	}}
 
-
-
-
+#exploring differences in deeper
+#In GT2, Actinobacteria and & Firmicutes are enriched in core
+cazy_string = "GH13"
+taxa_string = "Planctomycetes"
+mdf_core_subset <- subset(mdf_core, mdf_core$Cazy_fam == cazy_string & mdf_core$t2 == taxa_string)
+mdf_noncore_subset <- subset(mdf_noncore, mdf_noncore$Cazy_fam == cazy_string & mdf_noncore$t2 == taxa_string)
+summary(mdf_core_subset)
+summary(mdf_noncore_subset)
+cat(intersect(mdf_core_subset$t3, mdf_noncore_subset$t3),sep='\n')
+setdiff(mdf_core_subset$t3, mdf_noncore_subset$t3)
+setdiff(mdf_noncore_subset$t3, mdf_core_subset$t3)
+cat(intersect(mdf_core_subset$hit_id, mdf_noncore_subset$hit_id), sep="\n")
+intersect(mdf_core_subset$description, mdf_noncore_subset$description)
+setdiff(mdf_core_subset$hit_id, mdf_noncore_subset$hit_id)
+length(setdiff(mdf_noncore_subset$hit_id, mdf_core_subset$hit_id))
 ##################################################################################
 #Figure 5
 
