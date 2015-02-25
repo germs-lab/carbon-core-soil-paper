@@ -5,19 +5,19 @@ library(reshape)
 
 setwd("/Users/adina/Google Drive/C_Metabolism_Agg_Paper_2013/reproducibility/")
 ##################################################################################
-#FIGURE 1
+#SUPP FIGURE 1
 counts <- read.delim(sep=',',file="core-counts.csv",header=FALSE)
 colnames(counts) <- c('filecount','uniquecazy','bpcount','round')
 counts$filecount <- factor(counts$filecount, levels=c("1","2","3","4"))
 counts$bocount <- factor(counts$bpcount, levels=c("1","2","3","4"))
 counts$bpcount <- as.numeric(counts$bpcount)
 p = ggplot(counts, aes_string(x="filecount", y="uniquecazy", colour="bpcount"))
-p + geom_point(stat="identity", size=4) + ylab("Number of core sequences") + xlab("Total combined metagenomes") + theme_bw()+theme(text=element_text(size=10, family="Helvetica"))+theme(axis.text.x=element_text(size=15, angle=90),axis.text.y=element_text(size=15),axis.title.x=element_text(size=15),axis.title.y=element_text(size=15))+scale_colour_gradientn(colours=rainbow(2), "Cumulative bp")+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())
-ggsave(file="Fig_1.eps")
+p + geom_point(stat="identity", size=4) + ylab("Number of core sequences") + xlab("Total combined metagenomes") + theme_bw()+theme(text=element_text(size=10, family="Helvetica"))+theme(axis.text.x=element_text(size=15, angle=90),axis.text.y=element_text(size=15),axis.title.x=element_text(size=15),axis.title.y=element_text(size=15))+scale_colour_gradientn(colours=rainbow(2), "Cumulative bp")+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())
+ggsave(file="Supp_Fig_1.eps")
 ##################################################################################
 
 ##################################################################################
-#FIGURE 2A
+#FIGURE 1
 abundance_data <- read.delim(sep='\t', file="./summary.unfiltered.txt",header=TRUE, strip.white=TRUE, row.names=1)
 ann_data <- read.delim(sep='\t', file="./annotations_cazy.txt",header=TRUE, strip.white=TRUE, row.names=1)
 ann_only_euk <- subset(ann_data, t1 == "Eukaryota")
@@ -54,10 +54,10 @@ f2$Cazy_fam2 <- factor(f2$Cazy_fam2, levels=f2$Cazy_fam2[order(-f2$MEAN)])
 p = ggplot(f2, aes_string(x="Cazy_fam2", y="MEAN"))
 p = p + geom_bar(stat = "identity")+ geom_errorbar(limits, width=0) 
 p = p  + xlab("") + ylab("Abundance (per recA gene)")+ theme_bw()  + theme(axis.text.x = element_text(angle=90, hjust=1))
-p+theme(text=element_text(size=10, family="Helvetica"))+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+theme(axis.text.x=element_text(size=15),axis.text.y=element_text(size=15),axis.title.x=element_text(size=15),axis.title.y=element_text(size=15))
-ggsave(file="Fig_2.eps")
+p+theme(text=element_text(size=10, family="Helvetica"))+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+theme(axis.text.x=element_text(size=15),axis.text.y=element_text(size=15),axis.title.x=element_text(size=15),axis.title.y=element_text(size=15))
+ggsave(file="Fig_1a.eps")
 ##################################################################################
-#FIGURE 2B
+#FIGURE 1b
 mdf = psmelt(all_agg_core)
 mdf <- subset(mdf, Cazy_fam != "none")
 #mdf <- subset(mdf, Cazy_fam2 == "CE")
@@ -77,12 +77,12 @@ f2 <- subset(f2, Cazy_fam != "NA")
 p = ggplot(f2, aes_string(x="Cazy_fam", y="MEAN"))
 p = p + geom_point(stat = "identity", size=5, aes(color=Cazy_fam2, fill=Cazy_fam2))+ geom_errorbar(limits, width=0) 
 p = p  + xlab("") + ylab("Abundance (per recA)")+ theme_bw()  + theme(axis.text.x = element_text(angle=90, hjust=1))
-p+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+theme(axis.text.x=element_text(size=15),axis.text.y=element_text(size=20),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20))+scale_fill_manual("CAZy Enzyme Class", values=c("red","blue","dark green"))+scale_colour_manual("CAZy Enzyme Class", values=c("red","blue","dark green"))
-ggsave(file="Fig_2_insert.eps")
+p+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+theme(axis.text.x=element_text(size=15),axis.text.y=element_text(size=20),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20))+scale_fill_manual("CAZy Enzyme Class", values=c("red","blue","dark green"))+scale_colour_manual("CAZy Enzyme Class", values=c("red","blue","dark green"))
+ggsave(file="Fig_1b.eps")
 ##################################################################################
 
 ##################################################################################
-#FIGURE 3
+#FIGURE 2
 f <- ddply(mdf, .(sample_name, t2), summarise, SUM=sum(Abundance))
 f2 <- ddply(f, .(t2), summarise, MEAN=mean(SUM), SE=sd(SUM)/sqrt(length(SUM)))
 limits<-aes(ymin=MEAN-SE, ymax=MEAN+SE)
@@ -100,9 +100,9 @@ f2$t2=factor(f2$t2, levels=f2$t2[with(f2, order(-MEAN))][1:15])
 f2 <- subset(f2, t2 != "NA")
 p = ggplot(f2, aes_string(x="t2", y="MEAN"))
 p = p + geom_bar(stat = "identity")
-p = p + theme_bw()+ theme(text=element_text(size=20))+ylab("Abundance (per recA)") +geom_errorbar(limits, width=0) + theme(strip.text.x = element_text(angle = 90)) + theme(strip.text.y = element_text(angle = 0)) + theme(legend.position="none")+ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) + xlab("")+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())
+p = p + theme_bw()+ theme(text=element_text(size=20))+ylab("Abundance (per recA)") +geom_errorbar(limits, width=0) + theme(strip.text.x = element_text(angle = 90)) + theme(strip.text.y = element_text(angle = 0)) + theme(legend.position="none")+ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) + xlab("")+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())
 p
-ggsave(file="Fig_3.eps")
+ggsave(file="Fig_2.eps")
 ##################################################################################
 
 ##################################################################################
@@ -131,11 +131,11 @@ f2$t2=factor(f2$t2, levels=f2$t2[with(f2, order(-MEAN))][1:10])
 f2 <- subset(f2, t2 != "NA")
 p = ggplot(f2, aes_string(x="t2", y="MEAN"))
 p = p + geom_bar(stat = "identity")
-p = p + theme_bw()+ ylab("Abundance (per recA)") +geom_errorbar(limits, width=0) + facet_grid(~Cazy_fam2) +  theme(text=element_text(size=18), strip.text.x = element_text(angle = 90)) + theme(strip.text.y = element_text(angle = 0)) + theme(legend.position="none")+ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) + xlab("")+opts(panel.grid.major=theme_blank(), panel.grid.minor=theme_blank())
+p = p + theme_bw()+ ylab("Abundance (per recA)") +geom_errorbar(limits, width=0) + facet_grid(~Cazy_fam2) +  theme(text=element_text(size=18), strip.text.x = element_text(angle = 90)) + theme(strip.text.y = element_text(angle = 0)) + theme(legend.position="none")+ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) + xlab("")+theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank())
 p
-ggsave(file="Supp_Fig_2a.eps")
+ggsave(file="Supp_Fig_3a.eps")
 
-#SUPP FIG 2B
+#SUPP FIG 3B
 f <- ddply(mdf, .(Cazy_fam2,Cazy_fam, sample_name, t2), summarise, SUM=sum(Abundance))
 f2 <- ddply(f, .(Cazy_fam2, t2), summarise, MEAN=mean(SUM), SE=sd(SUM)/sqrt(length(SUM)))
 limits<-aes(ymin=MEAN-SE, ymax=MEAN+SE)
@@ -156,11 +156,11 @@ f2$t2=factor(f2$t2, levels=f2$t2[with(f2, order(-MEAN))][1:10])
 f2 <- subset(f2, t2 != "NA")
 p = ggplot(f2, aes_string(x="t2", y="MEAN"))
 p = p + geom_bar(stat = "identity")
-p = p + theme_bw()+ ylab("Abundance (per recA)") +geom_errorbar(limits, width=0) + facet_grid(~Cazy_fam2) +  theme(text=element_text(size=18), strip.text.x = element_text(angle = 90)) + theme(strip.text.y = element_text(angle = 0)) + theme(legend.position="none")+ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) + xlab("")+opts(panel.grid.major=theme_blank(), panel.grid.minor=theme_blank())
+p = p + theme_bw()+ ylab("Abundance (per recA)") +geom_errorbar(limits, width=0) + facet_grid(~Cazy_fam2) +  theme(text=element_text(size=18), strip.text.x = element_text(angle = 90)) + theme(strip.text.y = element_text(angle = 0)) + theme(legend.position="none")+ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) + xlab("")+theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank())
 p
-ggsave(file="Supp_Fig_2b.eps")
+ggsave(file="Supp_Fig_3b.eps")
 
-#SUPP FIG 2C
+#SUPP FIG 3C
 f <- ddply(mdf, .(Cazy_fam2,Cazy_fam, sample_name, t2), summarise, SUM=sum(Abundance))
 f2 <- ddply(f, .(Cazy_fam2, t2), summarise, MEAN=mean(SUM), SE=sd(SUM)/sqrt(length(SUM)))
 limits<-aes(ymin=MEAN-SE, ymax=MEAN+SE)
@@ -181,11 +181,11 @@ f2$t2=factor(f2$t2, levels=f2$t2[with(f2, order(-MEAN))][1:10])
 f2 <- subset(f2, t2 != "NA")
 p = ggplot(f2, aes_string(x="t2", y="MEAN"))
 p = p + geom_bar(stat = "identity")
-p = p + theme_bw()+ ylab("Abundance (per recA)") +geom_errorbar(limits, width=0) + facet_grid(~Cazy_fam2) +  theme(text=element_text(size=18), strip.text.x = element_text(angle = 90)) + theme(strip.text.y = element_text(angle = 0)) + theme(legend.position="none")+ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) + xlab("")+opts(panel.grid.major=theme_blank(), panel.grid.minor=theme_blank())
+p = p + theme_bw()+ ylab("Abundance (per recA)") +geom_errorbar(limits, width=0) + facet_grid(~Cazy_fam2) +  theme(text=element_text(size=18), strip.text.x = element_text(angle = 90)) + theme(strip.text.y = element_text(angle = 0)) + theme(legend.position="none")+ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) + xlab("")+theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank())
 p
-ggsave(file="Supp_Fig_2c.eps")
+ggsave(file="Supp_Fig_3c.eps")
 
-#SUPP FIG 2D
+#SUPP FIG 3D
 f <- ddply(mdf, .(Cazy_fam2,Cazy_fam, sample_name, t2), summarise, SUM=sum(Abundance))
 f2 <- ddply(f, .(Cazy_fam2, t2), summarise, MEAN=mean(SUM), SE=sd(SUM)/sqrt(length(SUM)))
 limits<-aes(ymin=MEAN-SE, ymax=MEAN+SE)
@@ -206,16 +206,16 @@ f2$t2=factor(f2$t2, levels=f2$t2[with(f2, order(-MEAN))][1:10])
 f2 <- subset(f2, t2 != "NA")
 p = ggplot(f2, aes_string(x="t2", y="MEAN"))
 p = p + geom_bar(stat = "identity")
-p = p + theme_bw()+ ylab("Abundance (per recA)") +geom_errorbar(limits, width=0) + facet_grid(~Cazy_fam2) +  theme(text=element_text(size=18), strip.text.x = element_text(angle = 90)) + theme(strip.text.y = element_text(angle = 0)) + theme(legend.position="none")+ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) + xlab("")+opts(panel.grid.major=theme_blank(), panel.grid.minor=theme_blank())
+p = p + theme_bw()+ ylab("Abundance (per recA)") +geom_errorbar(limits, width=0) + facet_grid(~Cazy_fam2) +  theme(text=element_text(size=18), strip.text.x = element_text(angle = 90)) + theme(strip.text.y = element_text(angle = 0)) + theme(legend.position="none")+ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) + xlab("")+theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank())
 p
-ggsave(file="Supp_Fig_2d.eps")
+ggsave(file="Supp_Fig_3d.eps")
 ##################################################################################
 
 
 
 
 ##################################################################################
-#FIGURE 4A
+#Supp FIGURE 4
 mdf_core<-psmelt(all_agg_core)
 mdf_noncore<-psmelt(all_agg)
 f <- ddply(mdf_core, .(Cazy_fam2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
@@ -267,9 +267,9 @@ temp <- subset(foo, dataset=="noncore")
 foo$Cazy_fam2 <- factor(foo$Cazy_fam2, levels=temp$Cazy_fam2[with(temp,order(-mean))][1:4])
 foo <- subset(foo, Cazy_fam2 != "NA")
 p = ggplot(foo, aes_string(x="Cazy_fam2", y="mean", colour="dataset", fill="dataset"))
-p = p + geom_bar(position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
-p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total"))+annotate("text",x=1,y=.47,label="***") + annotate("text",x=4, y=.11,label="***")
-ggsave(file="Fig_4a.eps")
+p = p + geom_bar(stat="identity",position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
+p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total"))+annotate("text",x=1,y=.47,label="***") + annotate("text",x=4, y=.11,label="***")
+ggsave(file="Supp_Fig_5a.eps")
 
 #Stats
 f$dataset <- "core"
@@ -280,7 +280,7 @@ summary(aov.result<-aov(SUMs ~ dataset, data = subset(combo, Cazy_fam2 == "GT"))
 summary(aov.result<-aov(SUMs ~ dataset, data = subset(combo, Cazy_fam2 == "CE")))
 summary(aov.result<-aov(SUMs ~ dataset, data = subset(combo, Cazy_fam2 == "GH")))
 
-#FIGURE 4B
+#Supp FIGURE 4B
 f <- ddply(mdf_core, .(Cazy_fam, Cazy_fam2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
 f2 <- ddply(f, .(Cazy_fam, Cazy_fam2, agg_frac), summarise, MEAN=mean(SUM), SE=sd(SUM)/sqrt(length(SUM)))
 g <- ddply(mdf_noncore, .(Cazy_fam, Cazy_fam2, sample_name, agg_frac), summarise, SUM=sum(Abundance))
@@ -330,10 +330,10 @@ temp <- subset(foo, dataset=="noncore")
 foo$Cazy_fam <- factor(foo$Cazy_fam, levels=temp$Cazy_fam[with(temp,order(-mean))][1:10])
 foo <- subset(foo, Cazy_fam != "NA")
 p = ggplot(foo, aes_string(x="Cazy_fam", y="mean", colour="dataset", fill="dataset"))
-p = p + geom_bar(position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
-p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total"))+annotate("text",x=2,y=.13,label="***") + annotate("text",x=3,y=.05,label="***") + annotate("text",x=4,y=.06,label="***")+annotate("text",x=5,y=.04,label="**") + annotate("text",x=7,y=.05,label="***") + annotate("text",x=8,y=.03,label="***")+annotate("text",x=9,y=.03,label="***") +annotate("text",x=10,y=.03,label="**") 
+p = p + geom_bar(stat="identity",position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
+p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total"))+annotate("text",x=2,y=.13,label="***") + annotate("text",x=3,y=.05,label="***") + annotate("text",x=4,y=.06,label="***")+annotate("text",x=5,y=.04,label="**") + annotate("text",x=7,y=.05,label="***") + annotate("text",x=8,y=.03,label="***")+annotate("text",x=9,y=.03,label="***") +annotate("text",x=10,y=.03,label="**") 
 
-ggsave(file="Fig_4b.eps")
+ggsave(file="Supp_Fig_5b.eps")
 
 f$dataset <- "core"
 g$dataset <- "noncore"
@@ -402,6 +402,7 @@ names(fam2_wgt2)[2]<-"std_er"
 fam2_stat<-join(fam2_wgt,fam2_wgt2)
 fam2_stat$dataset <- "noncore"
 
+
 foo <- rbind(fam_stat, fam2_stat)
 limits<-aes(ymin=mean-std_er, ymax=mean+std_er)
 colnames(foo)[1] <- "t2"
@@ -411,9 +412,9 @@ foo$t2 <- factor(foo$t2, levels=temp$t2[with(temp,order(-mean))][1:9])
 foo <- subset(foo, t2 != "NA")
 foo$Cazy_fam2 <- "GT4"
 p = ggplot(foo, aes_string(x="t2", y="mean", colour="dataset", fill="dataset"))
-p = p + geom_bar(position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
-p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+facet_grid(~Cazy_fam2)+theme(text=element_text(size=18), strip.text.x = element_text(angle = 90))+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total")) +annotate("text",x=2,y=.13,label="***") + annotate("text",x=4,y=.11,label="**") + annotate("text",x=5,y=.08,label="***")+annotate("text",x=6,y=.08,label="***") + annotate("text",x=7,y=.11,label="**") + annotate("text",x=8,y=.04,label="**")+annotate("text",x=9,y=.11,label="***") 
-ggsave(file="Supp_Fig_3a.eps")
+p = p + geom_bar(stat="identity",position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
+p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+facet_grid(~Cazy_fam2)+theme(text=element_text(size=18), strip.text.x = element_text(angle = 90))+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total")) +annotate("text",x=2,y=.13,label="***") + annotate("text",x=4,y=.11,label="**") + annotate("text",x=5,y=.08,label="***")+annotate("text",x=6,y=.08,label="***") + annotate("text",x=7,y=.11,label="**") + annotate("text",x=8,y=.04,label="**")+annotate("text",x=9,y=.11,label="***") 
+ggsave(file="Supp_Fig_6a.eps")
 
 l = unique(foo$t2)
 length_l = length(l)
@@ -488,9 +489,9 @@ foo$t2[foo_l+1]<-"Bacteroidetes"
 foo$dataset[foo_l+1]<-"core"
 foo$Cazy_fam2 <- "GH13"
 p = ggplot(foo, aes_string(x="t2", y="mean", colour="dataset", fill="dataset"))
-p = p + geom_bar(position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
-p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+facet_grid(~Cazy_fam2)+theme(text=element_text(size=18), strip.text.x = element_text(angle = 90))+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total"))+annotate("text",x=1,y=.43,label="***") + annotate("text",x=2,y=.33,label="***") + annotate("text",x=3,y=.1,label="***")+annotate("text",x=5,y=.1,label="*") + annotate("text",x=6,y=.1,label="***") + annotate("text",x=7,y=.1,label="***")+annotate("text",x=9,y=.05,label="*") 
-ggsave(file="Supp_Fig_3b.eps")
+p = p + geom_bar(stat="identity",position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
+p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+facet_grid(~Cazy_fam2)+theme(text=element_text(size=18), strip.text.x = element_text(angle = 90))+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total"))+annotate("text",x=1,y=.43,label="***") + annotate("text",x=2,y=.33,label="***") + annotate("text",x=3,y=.1,label="***")+annotate("text",x=5,y=.1,label="*") + annotate("text",x=6,y=.1,label="***") + annotate("text",x=7,y=.1,label="***")+annotate("text",x=9,y=.05,label="*") 
+ggsave(file="Supp_Fig_6b.eps")
 
 l = unique(foo$t2)
 length_l = length(l)
@@ -570,9 +571,9 @@ foo$dataset[foo_l+1]<-"core"
 foo <- subset(foo, t2 != "")
 foo$Cazy_fam2 <- "CE10"
 p = ggplot(foo, aes_string(x="t2", y="mean", colour="dataset", fill="dataset"))
-p = p + geom_bar(position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
-p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+facet_grid(~Cazy_fam2)+theme(text=element_text(size=18), strip.text.x = element_text(angle = 90))+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total"))+annotate("text",x=1,y=.55,label="***") + annotate("text",x=4,y=.1,label="**") + annotate("text",x=8,y=.1,label="*") 
-ggsave(file="Supp_Fig_3c.eps")
+p = p + geom_bar(stat="identity",position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
+p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+facet_grid(~Cazy_fam2)+theme(text=element_text(size=18), strip.text.x = element_text(angle = 90))+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total"))+annotate("text",x=1,y=.55,label="***") + annotate("text",x=4,y=.1,label="**") + annotate("text",x=8,y=.1,label="*") 
+ggsave(file="Supp_Fig_6c.eps")
 
 ##################################################################################
 #SUPP FIGURE 3D
@@ -630,9 +631,9 @@ temp <- subset(foo, dataset=="noncore")
 foo$t2 <- factor(foo$t2, levels=temp$t2[with(temp,order(-mean))][1:9])
 foo$Cazy_fam2 <- "GT2"
 p = ggplot(foo, aes_string(x="t2", y="mean", colour="dataset", fill="dataset"))
-p = p + geom_bar(position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
-p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+facet_grid(~Cazy_fam2)+theme(text=element_text(size=18), strip.text.x = element_text(angle = 90))+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total"))+annotate("text",x=3,y=.2,label="**") + annotate("text",x=4,y=.12,label="***") + annotate("text",x=5,y=.08,label="***")+ annotate("text",x=6,y=.06,label="***") + annotate("text",x=8,y=.04,label="**")
-ggsave(file="Supp_Fig_3d.eps")
+p = p + geom_bar(stat="identity",position="dodge") + geom_errorbar(limits, width=0, position=position_dodge(.9)) 
+p + theme_bw() + theme(text=element_text(size=20))+theme(axis.text.x=element_text(size=12, angle=90, hjust=1))+ylab("Relative Abundance")+xlab("")+facet_grid(~Cazy_fam2)+theme(text=element_text(size=18), strip.text.x = element_text(angle = 90))+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+scale_fill_manual("Dataset",values=c("black","white"),labels=c("core","total"))+scale_colour_manual("Dataset",values=c("black","black"), labels=c("core","total"))+annotate("text",x=3,y=.2,label="**") + annotate("text",x=4,y=.12,label="***") + annotate("text",x=5,y=.08,label="***")+ annotate("text",x=6,y=.06,label="***") + annotate("text",x=8,y=.04,label="**")
+ggsave(file="Supp_Fig_6d.eps")
 
 l = unique(foo$t2)
 length_l = length(l)
@@ -674,8 +675,8 @@ mdf<-melt(hist_data)
 mdf$sample<-factor(mdf$sample, levels=mdf$sample[order(-mdf$value)])
 p = ggplot(mdf, aes_string(x="sample", y="value"))
 p = p + geom_bar(stat = "identity")
-p + theme_bw()+ ylab("Shared Core Sequences")  + theme(text=element_text(size=14)) + theme(legend.position="none")+ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5), axis.text.y=element_text(angle=90)) + xlab("")+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())
-ggsave(file="Fig_5.eps")
+p + theme_bw()+ ylab("Shared Core Sequences")  + theme(text=element_text(size=14)) + theme(legend.position="none")+ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5), axis.text.y=element_text(angle=90)) + xlab("")+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())
+ggsave(file="Fig_3.eps")
 ##################################################################################
 
 ##################################################################################
@@ -734,7 +735,7 @@ mdf_melt <- melt.data.frame(new_t)
 mdf_melt$variable <- factor(mdf_melt$variable, levels=c("Fert Prairie Core","Fert Prairie Cumul.","Temp Grassland KP1",  "Tropical Forest PE6","Tropical Forest AR3","Boreal forest BZ1","Temp dec forest CL1","Temp con forest DF1","Hot desert MD3","Hot desert SF2","Hot desert SV1","Polar desert EB026","Polar desert EB017","Polar desert EB019","Polar desert EB020","Polar desert EB021","Polar desert EB024","Arctic tundra TL1"))
 
 p = ggplot(mdf_melt, aes_string(x="variable", y="value", color="Cazy_fam", fill="Cazy_fam"))
-p + geom_bar(stat="identity")+theme_bw()+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+theme(axis.text.x=element_text(size=15, angle=90),axis.text.y=element_text(size=20),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20))+xlab("Soil metagenome")+ylab("Relative Abundance")+scale_fill_manual("Cazy Enzyme Class",values=c("red","blue","dark green","orange","brown"))+scale_colour_manual("Cazy Enzyme Class",values=c("red","blue","dark green","orange","brown"))
+p + geom_bar(stat="identity")+theme_bw()+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+theme(axis.text.x=element_text(size=15, angle=90),axis.text.y=element_text(size=20),axis.title.x=element_text(size=20),axis.title.y=element_text(size=20))+xlab("Soil metagenome")+ylab("Relative Abundance")+scale_fill_manual("Cazy Enzyme Class",values=c("red","blue","dark green","orange","brown"))+scale_colour_manual("Cazy Enzyme Class",values=c("red","blue","dark green","orange","brown"))
 ggsave(file="Fig_6.eps")
 
 
@@ -772,16 +773,14 @@ alla<-rbind(a1,a5,a8)
 
 p = ggplot(f3, aes_string(x="EC", y="MEAN"))
 p = p + geom_point(stat = "identity")+ geom_errorbar(limits, width=0)+geom_point(data=alla, stat="identity", shape=21, size=5, colour='red')
-p + theme_bw()+ theme(axis.text.x = element_text(angle=90, hjust=1))+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+xlab("E.C. Number")+ylab("Abundance (per recA)")
-ggsave(file="Supp_Fig_4.eps")
+p + theme_bw()+ theme(axis.text.x = element_text(angle=90, hjust=1))+theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+xlab("E.C. Number")+ylab("Abundance (per recA)")
+ggsave(file="Supp_Fig_7.eps")
 
 
 ##################################################################################
-#Supp Table 3
 mdf = psmelt(all_agg_core)
 f <- ddply(mdf, .(OTU), summarise, MEAN=mean(Abundance), SE=sd(Abundance)/sqrt(4))
 ann <- as.data.frame(tax_table(all_agg_core))
 merged <- cbind(f, ann)
 summary(merged$MEAN)
 colnames(merged)<-c("Contig", "Mean Abundance", "SE","E.C.","CAZy Class","Family", "Hit ID", "Description","Taxonomy Lineage","","")
-write.table(merged, file="Supp_Table_3.tsv", quote=FALSE, sep="\t",row.names=TRUE, col.names=TRUE)

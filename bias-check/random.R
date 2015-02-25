@@ -24,7 +24,7 @@ mdf <- subset(mdf, mdf$variable != "LO")
 mdf$variable <- factor(mdf$variable, levels=mdf$variable[order(-mdf$value)])
 p<-ggplot(mdf, aes(variable,value))
 p+geom_boxplot(aes(fill=dataset,colour=dataset))+theme_bw()+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+xlab('CAZy Class')+ylab('Counts')
-ggsave(file="bias-cazy.eps")
+ggsave(file="Supp_Fig_4A.eps")
 
 
 summary(aov.results<-aov(CB~dataset,data=merged_stats))
@@ -58,7 +58,7 @@ mdf <- subset(mdf, mdf$variable == "Proteobacteria" | mdf$variable ==  "Firmicut
 mdf$variable <- factor(mdf$variable, levels=c("Proteobacteria", "Firmicutes","Fungi","Actinobacteria", "Cyanobacteria","Acidobacteria"))
 p<-ggplot(mdf, aes(variable,value))
 p+geom_boxplot(aes(fill=dataset,colour=dataset))+theme_bw()+opts(panel.grid.major=theme_blank(),panel.grid.minor=theme_blank())+xlab('Phyla')+ylab('Counts')+theme(axis.text.x = element_text(angle=90, hjust=1))
-ggsave(file="bias-taxa.eps")
+ggsave(file="Supp_Fig_4B.eps")
 
 
 
