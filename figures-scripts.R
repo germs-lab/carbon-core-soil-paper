@@ -844,7 +844,7 @@ comms<-edge.betweenness.community(g)
 
 # making plot
 dend_comm<-dendPlot(comms,col="black",colbar=c("red","forestgreen","blue","purple"))
-postscript("tree_fig.eps")
+postscript("Fig_5.eps")
 
 # making a dataframe that delineates modules for each EC
 mems<-data.frame(as.matrix(membership(comms)))
@@ -926,6 +926,6 @@ veganCovEllipse<-function (cov, center = c(0, 0), scale = 1, npoints = 100)
 X2
 
 X1+annotate("text",x=-2,y=1,label="A")
-ggsave("NMDS_A_fig.eps")
+ggsave("Supp_Fig_8_A.eps")
 X2+annotate("text",x=-2,y=1,label="B")
-ggsave("NMDS_B_fig.eps")
+ggsave("Supp_Fig_8_B.eps")
