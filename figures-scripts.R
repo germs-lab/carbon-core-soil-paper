@@ -784,3 +784,148 @@ ann <- as.data.frame(tax_table(all_agg_core))
 merged <- cbind(f, ann)
 summary(merged$MEAN)
 colnames(merged)<-c("Contig", "Mean Abundance", "SE","E.C.","CAZy Class","Family", "Hit ID", "Description","Taxonomy Lineage","","")
+
+
+
+##################################################################################
+
+# This script produces the co-occurrence networks that are used for the NMDS and tree figures
+
+
+# co-occurrence relationships are based on co-occurrence of ECs from different samples
+data_cast<-cast(mdf, Sample~EC, value="Abundance", fun.aggregate=sum)
+data_cast<-data.frame(data_cast, check.names=FALSE)
+
+
+# initiating a matrix that co-occurrence results will go into
+results<-matrix(nrow=0,ncol=4)
+options(warnings=-1)
+counter<-0
+for(a in 2:(dim(data_cast)[2]-1)){
+	for(b in (a+1):dim(data_cast)[2]){
+		
+		#co-occurrence is based on a spearman's correlation
+		test<-cor.test(data_cast[,a],data_cast[,b],method="spearman",na.action=na.rm)
+		rho<-test$estimate
+		p.value<-test$p.value
+		new.row<-c(names(data_cast)[a],names(data_cast)[b],rho,p.value)
+		results<-rbind(results,new.row)
+	}
+	counter<-counter+1
+	if(counter > 10){
+		print(paste(100*(a/(dim(data_cast)[2]-1)),"% Done",sep=""))
+		counter<-0
+	}
+	
+}
+
+
+core_results<-data.frame(results)
+head(core_results)
+
+head(core_results)
+names(core_results)<-c("ec1","ec2","rho","p.value")
+core_results$rho<-as.numeric(as.character(core_results$rho))
+core_results$p.value<-as.numeric(as.character(core_results$p.value))
+str(core_results)
+
+# removing values as noted in the manuscript
+core_sub<-subset(core_results, p.value < 0.084 & rho > 0)
+
+
+# making network
+# install.packages("igraph")
+library(igraph)
+g<-simplify(graph.edgelist(as.matrix(core_sub[,c(1,2)]),directed=FALSE))
+
+
+# producing communities (modules) based on edge betweenness
+comms<-edge.betweenness.community(g)
+
+# making plot
+dend_comm<-dendPlot(comms,col="black",colbar=c("red","forestgreen","blue","purple"))
+postscript("tree_fig.eps")
+
+# making a dataframe that delineates modules for each EC
+mems<-data.frame(as.matrix(membership(comms)))
+names(mems)<-"module"
+
+# adding these together
+mems$EC<-rownames(mems)
+mdf2<-merge(mdf,mems,by="EC")
+
+# removing n.d.s from further analyses and casting into an abundance matrix
+data_module<-data.frame(cast(subset(mdf2, EC !="n.d."), Sample+module+EC~t3, value="Abundance", fun.aggregate=sum))
+
+# transforming for relative abundances
+trans<-decostand(data_module[,-c(1:3)],"total")
+
+# tests for differences in communities among modules and ECs
+adonis(trans~data_module$module)
+adonis(trans~data_module$EC)
+
+# making a NMDS for visualization
+mds<-metaMDS(trans, k=3,autotransform=FALSE)
+
+#setting up figure
+MDS1<-data.frame(scores(mds))$NMDS1
+MDS2<-data.frame(scores(mds))$NMDS2
+
+Treatment<-as.factor(data_module$module)
+
+NMDS<-data.frame(MDS1,MDS2,Treatment)
+
+NMDS.mean=aggregate(NMDS[,1:2],list(group=Treatment),mean)
+
+veganCovEllipse<-function (cov, center = c(0, 0), scale = 1, npoints = 100) 
+  {
+    theta <- (0:npoints) * 2 * pi/npoints
+    Circle <- cbind(cos(theta), sin(theta))
+    t(center + scale * t(Circle %*% chol(cov)))
+  }
+
+  df_ell <- data.frame()
+  for(g in 1:length(unique(NMDS$Treatment))){
+    df_ell <- rbind(df_ell, cbind(as.data.frame(with(NMDS[NMDS$Treatment==as.vector(unique(NMDS$Treatment))[g],],
+                    veganCovEllipse(cov.wt(cbind(MDS1,MDS2),wt=rep(1/length(MDS1),length(MDS1)))$cov,center=c(mean(MDS1),mean(MDS2)))))
+                    ,group=as.vector(unique(NMDS$Treatment))[g]))
+  }
+  
+  X1<-ggplot(data = NMDS, aes(MDS1, MDS2)) + geom_point(aes(color = Treatment),size=3) +
+    geom_path(data=df_ell, aes(x=MDS1, y=MDS2,colour=group), size=1.5, linetype=5)+theme_bw()+theme(aspect.ratio=1)+scale_color_manual(values=c("red","forestgreen","blue","purple"),guide=guide_legend(title="Module"))+theme(axis.text.x=element_text(size=10),axis.text.y=element_text(size=10),axis.title.x=element_text(size=10),axis.title.y=element_text(size=10))+theme(legend.title=element_text(size=10),legend.text=element_text(size=10))+theme_bw(base_size=17)+theme(aspect.ratio=1)+labs(x="NMDS1",y="NMDS2")
+X1 
+ggsave(filename="NMDS_A_fig.eps")
+
+Treatment<-as.factor(data_module$EC)
+#Treatment
+NMDS<-data.frame(MDS1,MDS2,Treatment)
+NMDS
+length(unique(Treatment))
+NMDS.mean=aggregate(NMDS[,1:2],list(group=Treatment),mean)
+
+veganCovEllipse<-function (cov, center = c(0, 0), scale = 1, npoints = 100) 
+  {
+    theta <- (0:npoints) * 2 * pi/npoints
+    Circle <- cbind(cos(theta), sin(theta))
+    t(center + scale * t(Circle %*% chol(cov)))
+  }
+
+  df_ell <- data.frame()
+  for(g in 1:length(unique(NMDS$Treatment))){
+    df_ell <- rbind(df_ell, cbind(as.data.frame(with(NMDS[NMDS$Treatment==as.vector(unique(NMDS$Treatment))[g],],
+                    veganCovEllipse(cov.wt(cbind(MDS1,MDS2),wt=rep(1/length(MDS1),length(MDS1)))$cov,center=c(mean(MDS1),mean(MDS2)))))
+                    ,group=as.vector(unique(NMDS$Treatment))[g]))
+  }
+
+
+
+
+
+ X2<-ggplot(data = NMDS, aes(MDS1, MDS2)) + geom_point(aes(color = Treatment),size=3) +
+    geom_path(data=df_ell, aes(x=MDS1, y=MDS2,colour=group), size=1.5, linetype=5)+theme_bw()+theme(aspect.ratio=1)+scale_color_manual(values=rainbow(15),guide=guide_legend(title="E.C."))+theme(axis.text.x=element_text(size=10),axis.text.y=element_text(size=10),axis.title.x=element_text(size=10),axis.title.y=element_text(size=10))+theme(legend.title=element_text(size=10),legend.text=element_text(size=10))+theme_bw(base_size=17)+theme(aspect.ratio=1)+labs(x="NMDS1",y="NMDS2")
+X2
+
+X1+annotate("text",x=-2,y=1,label="A")
+ggsave("NMDS_A_fig.eps")
+X2+annotate("text",x=-2,y=1,label="B")
+ggsave("NMDS_B_fig.eps")
